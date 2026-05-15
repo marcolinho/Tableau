@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Matrimonio — Lista Tavoli</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #f0c040;
+    --gold-dim: #a07d1a;
+    --white: #e8e4d8;
+    --off-white: #b0aa9a;
+    --dim: #666050;
+    --dark: #0a0906;
+    --dark-mid: #111008;
+    --row-bg: #0d0c08;
+    --row-hover: #181508;
+    --row-active: #2a2000;
+    --border: rgba(240,192,64,0.15);
+    --border-bright: rgba(240,192,64,0.5);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--dark);
+    color: var(--white);
+    font-family: 'Share Tech Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* CRT scanlines */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.08) 2px,
+      rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 200;
+  }
+
+  /* Vignette */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.75) 100%);
+    pointer-events: none;
+    z-index: 199;
+  }
+
+  .page-wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 40px 20px 60px;
+  }
+
+  /* ── HEADER ── */
+  header {
+    margin-bottom: 36px;
+    border: 1px solid var(--border);
+    padding: 24px 28px 20px;
+    position: relative;
+    background: var(--dark-mid);
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--gold);
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 14px;
+  }
+
+  .projector-icon {
+    font-size: 2rem;
+    line-height: 1;
+    filter: drop-shadow(0 0 8px rgba(240,192,64,0.5));
+  }
+
+  .header-main {
+    flex: 1;
+  }
+
+  .header-label {
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.4em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .header-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(1.3rem, 3vw, 1.9rem);
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--white);
+    line-height: 1;
+  }
+
+  .header-title span { color: var(--gold); }
+
+  .header-date {
+    font-size: 0.72rem;
+    color: var(--dim);
+    letter-spacing: 0.2em;
+    margin-top: 4px;
+  }
+
+  .header-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid var(--border);
+    padding-top: 12px;
+    margin-top: 4px;
+  }
+
+  .search-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .search-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    color: var(--dim);
+    text-transform: uppercase;
+  }
+
+  .search-input {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--border-bright);
+    padding: 4px 8px;
+    color: var(--white);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+    width: 200px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-input::placeholder { color: var(--dim); }
+  .search-input:focus { border-color: var(--gold); }
+
+  /* ── GUEST MATCH PANEL ── */
+  .guest-match {
+    margin-bottom: 24px;
+    border: 1px solid var(--gold);
+    background: rgba(240,192,64,0.04);
+    animation: rowIn 0.3s both;
+    overflow: hidden;
+  }
+
+  .guest-match-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    border-bottom: 1px solid rgba(240,192,64,0.2);
+    background: rgba(240,192,64,0.06);
+  }
+
+  .gm-icon { font-size: 1.1rem; }
+
+  .gm-label {
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  .gm-count {
+    margin-left: auto;
+    font-size: 0.6rem;
+    color: var(--dim);
+    letter-spacing: 0.15em;
+  }
+
+  .guest-match-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    padding: 12px 18px;
+    border-bottom: 1px solid rgba(240,192,64,0.08);
+    cursor: pointer;
+    transition: background 0.15s;
+    gap: 16px;
+  }
+
+  .guest-match-row:last-child { border-bottom: none; }
+  .guest-match-row:hover { background: rgba(240,192,64,0.06); }
+
+  .gm-guest-name {
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--white);
+  }
+
+  .gm-guest-name mark {
+    background: transparent;
+    color: var(--gold);
+  }
+
+  .gm-table-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .gm-table-pill {
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    background: rgba(240,192,64,0.08);
+    white-space: nowrap;
+  }
+
+  .gm-movie {
+    font-size: 0.7rem;
+    color: var(--dim);
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+  }
+
+  .live-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+
+  .live-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+    animation: livePulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes livePulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(240,192,64,0.4); }
+    50% { opacity: 0.6; box-shadow: 0 0 0 4px rgba(240,192,64,0); }
+  }
+
+  /* ── BOARD ── */
+  .board {
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  /* Column headers */
+  .board-header {
+    display: grid;
+    grid-template-columns: 90px 100px 1fr 90px;
+    background: var(--dark-mid);
+    border-bottom: 2px solid var(--gold);
+    padding: 0;
+  }
+
+  .col-head {
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    padding: 10px 16px;
+    border-right: 1px solid var(--border);
+  }
+
+  .col-head:last-child { border-right: none; text-align: right; }
+
+  /* Rows */
+  .board-row {
+    display: grid;
+    grid-template-columns: 90px 100px 1fr 90px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    background: var(--row-bg);
+    transition: background 0.15s;
+    position: relative;
+    animation: rowIn 0.4s both;
+  }
+
+  @keyframes rowIn {
+    from { opacity: 0; transform: translateX(-8px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  .board-row:last-child { border-bottom: none; }
+
+  .board-row:hover {
+    background: var(--row-hover);
+  }
+
+  .board-row.active {
+    background: var(--row-active);
+  }
+
+  .board-row.active::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--gold);
+  }
+
+  .cell {
+    padding: 14px 16px;
+    border-right: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    font-size: 0.88rem;
+    letter-spacing: 0.05em;
+  }
+
+  .cell:last-child { border-right: none; }
+
+  .cell-time {
+    color: var(--off-white);
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+  }
+
+  .cell-sala {
+    color: var(--off-white);
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+  }
+
+  .cell-sala strong {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 500;
+    font-size: 1rem;
+    color: var(--white);
+  }
+
+  .board-row.active .cell-sala strong { color: var(--gold); }
+
+  .cell-movie {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+  }
+
+  .movie-name {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--white);
+    transition: color 0.2s;
+  }
+
+  .board-row:hover .movie-name,
+  .board-row.active .movie-name { color: var(--gold); }
+
+  .movie-meta {
+    font-size: 0.7rem;
+    color: var(--dim);
+    letter-spacing: 0.1em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .movie-emoji { font-size: 0.75rem; }
+
+  .cell-stato {
+    justify-content: flex-end;
+  }
+
+  .stato-badge {
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 4px 8px;
+    border: 1px solid;
+    border-radius: 1px;
+    color: var(--dim);
+    border-color: var(--border);
+    transition: all 0.2s;
+  }
+
+  .board-row.active .stato-badge {
+    color: var(--gold);
+    border-color: var(--gold);
+    background: rgba(240,192,64,0.08);
+    animation: badgePulse 2s ease-in-out infinite;
+  }
+
+  @keyframes badgePulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(240,192,64,0); }
+    50% { box-shadow: 0 0 8px 2px rgba(240,192,64,0.15); }
+  }
+
+  /* No results */
+  .no-results {
+    text-align: center;
+    padding: 48px;
+    color: var(--dim);
+    font-size: 0.85rem;
+    letter-spacing: 0.15em;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ── FOOTER ── */
+  .board-footer {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 4px;
+  }
+
+  .footer-note {
+    font-size: 0.65rem;
+    color: var(--dim);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-style: italic;
+  }
+
+  .total-count {
+    font-size: 0.65rem;
+    color: var(--dim);
+    letter-spacing: 0.15em;
+  }
+
+  .total-count span { color: var(--gold); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-thumb { background: rgba(240,192,64,0.2); }
+</style>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <header>
+    <div class="header-top">
+      <div class="projector-icon">📽</div>
+      <div class="header-main">
+        <p class="header-label">Now Showing — Find Your Table</p>
+        <h1 class="header-title">Sophia <span>&</span> Marco</h1>
+        <p class="header-date">Sabato 14 Giugno 2025 · Grand Cinema Reception</p>
+      </div>
+    </div>
+    <div class="header-bottom">
+      <div class="search-wrap">
+        <span class="search-label">CERCA</span>
+        <input class="search-input" type="text" id="searchInput" placeholder="film, sala…">
+      </div>
+      <div class="live-badge">
+        <div class="live-dot"></div>
+        LIVE
+      </div>
+    </div>
+  </header>
+
+  <div id="guestMatchPanel"></div>
+
+  <div class="board">
+    <div class="board-header">
+      <div class="col-head">Orario</div>
+      <div class="col-head">Sala</div>
+      <div class="col-head">Titolo</div>
+      <div class="col-head" style="text-align:right">Stato</div>
+    </div>
+    <div id="boardBody"></div>
+  </div>
+
+  <div class="board-footer">
+    <p class="footer-note">🎞 Seleziona un tavolo per visualizzarlo sul secondo schermo</p>
+    <p class="total-count" id="countLabel"></p>
+  </div>
+
+</div>
+
+<script>
+const tables = [
+  { id:1,  movie:"Casablanca",                  year:"1942", emoji:"🎩", color:"#2a1f0e", guests:["Luca Bianchi","Marta Rossi","Andrea Ferrari","Giulia Romano","Paolo Esposito","Chiara Gallo","Stefano Ricci","Elena Mancini"] },
+  { id:2,  movie:"La Dolce Vita",               year:"1960", emoji:"🍾", color:"#0e1a2a", guests:["Roberto Conti","Alessia Bruno","Marco Fontana","Laura Rizzo","Davide Serra","Francesca Leone","Giorgio Costa","Valeria Moretti"] },
+  { id:3,  movie:"Cinema Paradiso",             year:"1988", emoji:"📽️", color:"#1a0e0e", guests:["Nicola Santoro","Beatrice Greco","Matteo Lombardi","Sara Giordano","Antonio Ferraro","Claudia Caruso","Simone Pellegrino","Monica Barbieri"] },
+  { id:4,  movie:"Il Padrino",                  year:"1972", emoji:"🥀", color:"#0a150a", guests:["Giovanni Amato","Silvia Gatti","Emanuele Marini","Cristina D'Angelo","Federico Basile","Teresa Villa","Raffaele Orlando","Carmen Messina"] },
+  { id:5,  movie:"Titanic",                     year:"1997", emoji:"⚓", color:"#0a0f1a", guests:["Alessandro Fiore","Roberta Poli","Salvatore Rizzi","Elena Coppola","Daniele Bianco","Paola Neri","Massimo De Luca","Luisa Vitale"] },
+  { id:6,  movie:"Roman Holiday",               year:"1953", emoji:"🛵", color:"#1a1505", guests:["Claudio Russo","Marina Palumbo","Fabrizio Testa","Giovanna Marchetti","Piero Galli","Daniela Monti","Sergio Cattaneo","Anna Longo"] },
+  { id:7,  movie:"2001: Odissea nello Spazio",  year:"1968", emoji:"🚀", color:"#05051a", guests:["Enrico Sala","Sabrina Negri","Carmelo Fabbri","Ilaria Ferretti","Lorenzo Ruggeri","Valentina Grassi","Maurizio Sanna","Cecilia Piras"] },
+  { id:8,  movie:"Nuovo Cinema Paradiso",       year:"1988", emoji:"🌟", color:"#1a1205", guests:["Vittorio Crimi","Ornella Bruni","Antonino Pace","Angela Grasso","Diego Piccolo","Lucia Gentile","Emilio Barone","Rosa Martino"] },
+  { id:9,  movie:"Blade Runner",                year:"1982", emoji:"🌧️", color:"#08100a", guests:["Francesco Riva","Michela Sacco","Riccardo Landi","Giorgia Parisi","Umberto Tosi","Noemi Carbone","Livio Penna","Patrizia Guidi"] },
+  { id:10, movie:"Colazione da Tiffany",        year:"1961", emoji:"💎", color:"#1a0f1a", guests:["Carlo Venturi","Miriam Donati","Enzo Colombo","Federica Stein","Augusto Canova","Letizia Moro","Giacomo Fusi","Arianna Volta"] }
+];
+
+// Staggered times starting at 18:00, +15 min each
+const startMinutes = 18 * 60;
+function getTime(i) {
+  const m = startMinutes + i * 15;
+  const h = Math.floor(m / 60);
+  const min = m % 60;
+  return `${String(h).padStart(2,'0')}:${String(min).padStart(2,'0')}`;
+}
+
+let activeTable = null;
+const channel = new BroadcastChannel('matrimonio_tavoli');
+
+function highlightMatch(text, q) {
+  if (!q) return text;
+  const idx = text.toLowerCase().indexOf(q.toLowerCase());
+  if (idx === -1) return text;
+  return text.slice(0, idx) + '<mark>' + text.slice(idx, idx + q.length) + '</mark>' + text.slice(idx + q.length);
+}
+
+function renderGuestMatches(q) {
+  const panel = document.getElementById('guestMatchPanel');
+  if (!q || q.length < 2) { panel.innerHTML = ''; return; }
+
+  const matches = [];
+  tables.forEach(t => {
+    t.guests.forEach(g => {
+      if (g.toLowerCase().includes(q.toLowerCase())) {
+        matches.push({ guest: g, table: t });
+      }
+    });
+  });
+
+  if (!matches.length) { panel.innerHTML = ''; return; }
+
+  panel.innerHTML = `
+    <div class="guest-match">
+      <div class="guest-match-header">
+        <span class="gm-icon">🎟</span>
+        <span class="gm-label">Ospiti trovati</span>
+        <span class="gm-count">${matches.length} risultat${matches.length === 1 ? 'o' : 'i'}</span>
+      </div>
+      ${matches.map(m => `
+        <div class="guest-match-row" onclick="selectTable(${m.table.id})">
+          <span class="gm-guest-name">${highlightMatch(m.guest, q)}</span>
+          <div class="gm-table-info">
+            <span class="gm-movie">${m.table.emoji} ${m.table.movie}</span>
+            <span class="gm-table-pill">SALA ${String(m.table.id).padStart(2,'0')}</span>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderRows(filter = '') {
+  const body = document.getElementById('boardBody');
+  const countLabel = document.getElementById('countLabel');
+  const q = filter.toLowerCase();
+
+  const filtered = tables.filter(t =>
+    t.movie.toLowerCase().includes(q) ||
+    String(t.id).includes(q) ||
+    t.year.includes(q)
+  );
+/*
+  countLabel.innerHTML = `<span>${filtered.length}</span> / ${tables.length} tavoli`;
+
+  if (!filtered.length) {
+    body.innerHTML = `<div class="no-results">Nessun risultato per "${filter}"</div>`;
+    return;
+  }
+*/
+  body.innerHTML = filtered.map((t, i) => `
+    <div class="board-row ${activeTable === t.id ? 'active' : ''}"
+         onclick="selectTable(${t.id})"
+         style="animation-delay:${i * 0.04}s">
+      <div class="cell cell-time">${getTime(t.id - 1)}</div>
+      <div class="cell cell-sala">SALA&nbsp;<strong>${String(t.id).padStart(2,'0')}</strong></div>
+      <div class="cell cell-movie">
+        <span class="movie-name">${t.movie}</span>
+        <span class="movie-meta">
+          <span class="movie-emoji">${t.emoji}</span>
+          ${t.year} &nbsp;·&nbsp; ${t.guests.length} ospiti
+        </span>
+      </div>
+      <div class="cell cell-stato">
+        <span class="stato-badge">${activeTable === t.id ? '● IN DISPLAY' : 'LIBERO'}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function selectTable(id) {
+  activeTable = id;
+  const table = tables.find(t => t.id === id);
+  channel.postMessage({ type: 'SELECT_TABLE', table });
+  localStorage.setItem('selectedTable', JSON.stringify(table));
+  const q = document.getElementById('searchInput').value;
+  renderGuestMatches(q);
+  renderRows(q);
+}
+
+document.getElementById('searchInput').addEventListener('input', e => {
+  const val = e.target.value;
+
+  renderGuestMatches(val);
+
+  // verifica se ci sono ospiti trovati
+  const hasGuestMatches = tables.some(t =>
+    t.guests.some(g =>
+      g.toLowerCase().includes(val.toLowerCase())
+    )
+  );
+
+  // mostra/nascondi la board
+  document.querySelector('.board').style.display =
+    hasGuestMatches && val.length >= 2 ? 'none' : 'block';
+
+  document.querySelector('.board-footer').style.display =
+    hasGuestMatches && val.length >= 2 ? 'none' : 'flex';
+
+  renderRows(val);
+});
+
+// Sync from storage
+const saved = localStorage.getItem('selectedTable');
+if (saved) {
+  try { activeTable = JSON.parse(saved).id; } catch(e) {}
+}
+
+renderRows();
+</script>
+</body>
+</html>
