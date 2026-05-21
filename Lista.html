@@ -471,6 +471,32 @@
   /* Scrollbar */
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-thumb { background: rgba(240,192,64,0.2); }
+
+  #slideshowBtn {
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border: 1px solid rgba(240,192,64,0.3);
+    background: transparent;
+    color: rgba(240,192,64,0.45);
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 1px;
+  }
+  #slideshowBtn:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: rgba(240,192,64,0.06);
+  }
+  #slideshowBtn.active {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: rgba(240,192,64,0.1);
+    animation: badgePulse 2s ease-in-out infinite;
+  }
 </style>
 </head>
 <body>
@@ -494,6 +520,9 @@
         <div class="live-dot"></div>
         LIVE
       </div>
+      <button id="slideshowBtn" onclick="toggleSlideshow()" title="Avvia slideshow automatico sul Display">
+        ▶ SLIDESHOW
+      </button>
     </div>
   </header>
 
@@ -659,6 +688,38 @@ document.getElementById('searchInput').addEventListener('input', e => {
     hasGuestMatches && val.length >= 2 ? 'none' : 'flex';
 
   renderRows(val);
+});
+
+// Slideshow control
+let slideshowActive = false;
+function toggleSlideshow() {
+  slideshowActive = !slideshowActive;
+  const btn = document.getElementById('slideshowBtn');
+  if (slideshowActive) {
+    btn.textContent = '⏹ STOP';
+    btn.classList.add('active');
+    channel.postMessage({ type: 'START_SLIDESHOW' });
+  } else {
+    btn.textContent = '▶ SLIDESHOW';
+    btn.classList.remove('active');
+    channel.postMessage({ type: 'STOP_SLIDESHOW' });
+  }
+}
+
+// Slideshow sync from Display
+channel.addEventListener('message', e => {
+  if (e.data.type === 'SLIDESHOW_ACTIVE') {
+    activeTable = e.data.tableId;
+    renderRows(document.getElementById('searchInput').value);
+  }
+  if (e.data.type === 'SLIDESHOW_STARTED') {
+    const input = document.getElementById('searchInput');
+    input.value = '';
+    document.getElementById('guestMatchPanel').innerHTML = '';
+    document.querySelector('.board').style.display = 'block';
+    document.querySelector('.board-footer').style.display = 'flex';
+    renderRows('');
+  }
 });
 
 // Sync from storage
