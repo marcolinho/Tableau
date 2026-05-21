@@ -457,6 +457,85 @@
     50%       { opacity: 1;   transform: translateX(-50%) translateY(-5px); }
   }
 
+  /* ── CIAK OVERLAY ── */
+  #ciakOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    background: rgba(0,0,0,0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+  }
+  #ciakOverlay.show { opacity: 1; pointer-events: none; }
+
+  #ciakSVG {
+    width: min(420px, 85vw);
+    filter: drop-shadow(0 0 30px rgba(201,168,76,0.3));
+  }
+
+  #ciakTop {
+    transform: rotate(-35deg);
+    transform-box: fill-box;
+    transform-origin: left bottom;
+    transition: transform 0.18s cubic-bezier(0.4,0,0.2,1);
+  }
+  #ciakTop.slam {
+    transform: rotate(0deg);
+    transform-box: fill-box;
+    transform-origin: left bottom;
+  }
+
+  /* ── SLIDESHOW BAR ── */
+  #slideshowBar {
+    position: fixed;
+    bottom: 36px;
+    right: 24px;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(201,168,76,0.2);
+    padding: 6px 12px 6px 6px;
+    border-radius: 2px;
+    backdrop-filter: blur(4px);
+  }
+
+  #slideshowProgress {
+    width: 80px;
+    height: 3px;
+    background: rgba(201,168,76,0.15);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  #slideshowProgress::after {
+    content: '';
+    position: absolute;
+    left: 0; top: 0;
+    height: 100%;
+    background: var(--gold);
+    border-radius: 2px;
+    width: 0%;
+    transition: width linear;
+  }
+  #slideshowProgress.running::after {
+    width: 100%;
+  }
+
+  #slideshowLabel {
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    color: rgba(201,168,76,0.5);
+    font-family: 'Cormorant Garamond', serif;
+    text-transform: uppercase;
+  }
+
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.2); }
 </style>
@@ -464,6 +543,58 @@
 <body>
 
 <div id="transitionOverlay"></div>
+
+<!-- Ciak overlay -->
+<div id="ciakOverlay" aria-hidden="true">
+  <svg id="ciakSVG" viewBox="0 0 420 160" xmlns="http://www.w3.org/2000/svg">
+    <!-- Bottom part (static) -->
+    <rect x="10" y="90" width="400" height="60" rx="4" fill="#111" stroke="#c9a84c" stroke-width="1.5"/>
+    <rect x="10" y="90" width="400" height="18" fill="#c9a84c" opacity="0.15"/>
+    <!-- Stripes bottom -->
+    <rect x="30"  y="95" width="30" height="8" rx="1" fill="#c9a84c" opacity="0.7"/>
+    <rect x="75"  y="95" width="30" height="8" rx="1" fill="#1a1a1a"/>
+    <rect x="120" y="95" width="30" height="8" rx="1" fill="#c9a84c" opacity="0.7"/>
+    <rect x="165" y="95" width="30" height="8" rx="1" fill="#1a1a1a"/>
+    <rect x="210" y="95" width="30" height="8" rx="1" fill="#c9a84c" opacity="0.7"/>
+    <rect x="255" y="95" width="30" height="8" rx="1" fill="#1a1a1a"/>
+    <rect x="300" y="95" width="30" height="8" rx="1" fill="#c9a84c" opacity="0.7"/>
+    <rect x="345" y="95" width="30" height="8" rx="1" fill="#1a1a1a"/>
+    <!-- Text bottom -->
+    <text x="215" y="130" text-anchor="middle" font-family="monospace" font-size="13" fill="#c9a84c" letter-spacing="3">FEDERICA &amp; ALESSANDRO</text>
+    <text x="215" y="145" text-anchor="middle" font-family="monospace" font-size="9" fill="#c9a84c" opacity="0.5" letter-spacing="2">14 SETTEMBRE 2026</text>
+
+    <!-- Top part (animated, rotates down) -->
+    <g id="ciakTop" transform-origin="10 90">
+      <rect x="10" y="28" width="400" height="62" rx="4" fill="#1a1a1a" stroke="#c9a84c" stroke-width="1.5"/>
+      <!-- Stripes top (diagonal) -->
+      <rect x="30"  y="33" width="30" height="8" rx="1" fill="#c9a84c" opacity="0.85"/>
+      <rect x="75"  y="33" width="30" height="8" rx="1" fill="#111"/>
+      <rect x="120" y="33" width="30" height="8" rx="1" fill="#c9a84c" opacity="0.85"/>
+      <rect x="165" y="33" width="30" height="8" rx="1" fill="#111"/>
+      <rect x="210" y="33" width="30" height="8" rx="1" fill="#c9a84c" opacity="0.85"/>
+      <rect x="255" y="33" width="30" height="8" rx="1" fill="#111"/>
+      <rect x="300" y="33" width="30" height="8" rx="1" fill="#c9a84c" opacity="0.85"/>
+      <rect x="345" y="33" width="30" height="8" rx="1" fill="#111"/>
+      <!-- Hinge circles -->
+      <circle cx="40"  cy="90" r="5" fill="#c9a84c" opacity="0.4"/>
+      <circle cx="100" cy="90" r="5" fill="#c9a84c" opacity="0.4"/>
+      <circle cx="160" cy="90" r="5" fill="#c9a84c" opacity="0.4"/>
+      <circle cx="220" cy="90" r="5" fill="#c9a84c" opacity="0.4"/>
+      <circle cx="280" cy="90" r="5" fill="#c9a84c" opacity="0.4"/>
+      <circle cx="340" cy="90" r="5" fill="#c9a84c" opacity="0.4"/>
+      <circle cx="380" cy="90" r="5" fill="#c9a84c" opacity="0.4"/>
+      <!-- Text top -->
+      <text x="215" y="68" text-anchor="middle" font-family="monospace" font-size="13" fill="#c9a84c" letter-spacing="3">MATRIMONIO</text>
+      <text x="215" y="82" text-anchor="middle" font-family="monospace" font-size="9" fill="#c9a84c" opacity="0.5" letter-spacing="2">TAVOLO IN USCITA</text>
+    </g>
+  </svg>
+</div>
+
+<!-- Slideshow indicator -->
+<div id="slideshowBar" style="display:none">
+  <div id="slideshowProgress"></div>
+  <span id="slideshowLabel">▶ SLIDESHOW</span>
+</div>
 
 <!-- Idle screen -->
 <div id="idleScreen">
@@ -499,6 +630,26 @@
 <script>
 const channel = new BroadcastChannel('matrimonio_tavoli');
 
+// ── TABLE DATA (needed for slideshow) ──
+const tables = [
+  { id:1,  movie:"Harry Potter",              year:"2001", emoji:"🎩", color:"#2a1f0e", guests:["Alessia Cavicchio","Michela Galli","Eleonora Perotta","Francesco Mammoliti","Fidanzata Francesco","Arianna Bressan"] },
+  { id:2,  movie:"Fast & Furious",            year:"2001", emoji:"🍾", color:"#0e1a2a", guests:["Martina Paganini","Luca Nozzolillo","Barbara Colombo","Gabriele","Kevin Re","Davide Collato","Alessandro Collato","Chiara Lange","Lorenzo Tinelli","Dario Granvillano"] },
+  { id:3,  movie:"The Avengers",              year:"2012", emoji:"📽️", color:"#1a0e0e", guests:["Marco Sardina","Aurora Carretta","Giorgia Bonanno","Francesco Mammoliti","Stefano Bonanno","Alessia de Benedetto","Aurora de Benedetto","Tommaso","Federico Zigrillo","Antonella"] },
+  { id:4,  movie:"Twilight",                  year:"2008", emoji:"🥀", color:"#0a150a", guests:["Elisabetta Ancona","Emanuele Sardina","Lucrezia Ancona","Francesco Bonanno","Angela Ancona","Sebastiano Zigrillo","Mario Ancona","Dino de Benedetto","Ombretta"] },
+  { id:5,  movie:"Il Signore degli Anelli",   year:"2001", emoji:"⚓", color:"#0a0f1a", guests:["Elisabetta Sola","Roberto Truzzi","Massimiliano Loreggiola","Silvia Mussini","Daniela de Bernardi","Anna Monolo","Tiziano Sola","Sara Sola","Niccolò Zanzottera","Daniel Zanzottera","? Zanzottera"] },
+  { id:6,  movie:"Footloose",                 year:"2011", emoji:"🛵", color:"#1a1505", guests:["Alessia Truzzi","Arianna Truzzi","Alice Loreggiola","Fidanzato Alice","Sara Truzzi","Stefano Venturini","Lorenzo Venturini","Enza De Santis"] },
+  { id:7,  movie:"I Pirati dei Caraibi",      year:"2003", emoji:"🚀", color:"#05051a", guests:["Lidia Spina","Davide Spina","Giuseppina Sardina","Francesco Spina","Sebastiano Sardina","Isabella","Giuseppe Sardina","Sofia Sardina","Angelo","Angela Sardina"] },
+  { id:8,  movie:"50 Volte il primo bacio",   year:"2004", emoji:"🌟", color:"#1a1205", guests:["Valentina Ligas","Federico Caironi","Melissa Caironi","Alessandra Caironi","Valeria Ligas","Giuseppe","Francesca Monolo","Marina Mazza","Ernesto Monolo","Gianna Monolo","Giorgio Ligas"] },
+  { id:9,  movie:"Una Notte da Leoni",        year:"2009", emoji:"🌧️", color:"#08100a", guests:["Walter Buongiovanni","Loredana","Giorgia Buongiovanni","Matteo Buongiovanni","Ilaria Garruto","Francesco Garruto","Anna","Cristina Radaelli","Beatrice Ghiringhelli","Matteo Ghiringhelli"] },
+  { id:10, movie:"Hunger Games",              year:"2012", emoji:"💎", color:"#1a0f1a", guests:["Giorgio Ancona","Patrizia","Riccardo Ancona","Alessandro Ancona","Fidanzata Alessandro","Maila Ancona","Francesca Ancona"] },
+  { id:11, movie:"Forrest Gump",              year:"1994", emoji:"💎", color:"#1a0f1a", guests:["Nicola Ancona","Mina","Giovanni Ancona","Raffaella","Antonio Ancona","Irene","Carlo Ancona","Lina"] },
+  { id:12, movie:"Avatar",                    year:"2009", emoji:"💎", color:"#1a0f1a", guests:["Giovanni Totaro","Marinella","Francesca Totaro","Angela Totaro","Zio Gino"] },
+  { id:13, movie:"Quo Vado",                  year:"2016", emoji:"💎", color:"#1a0f1a", guests:["Antonia De Bernardi","Claudio","Rosangela Sola","Pinuccia Sola","Pinuccio","Adelina Ceolato","Ezio Sola","Santina Sola"] },
+  { id:14, movie:"Bohemian Rapsody",          year:"2018", emoji:"💎", color:"#1a0f1a", guests:["Vladlena Nikolaevna Lvova","Carmelina Polichetti","Francesca Riccardo","Maria Grazia Rosa Sbarra","Matteo Manzelli","Alessio Giuseppe Paleari"] },
+  { id:15, movie:"Fall Guy",                  year:"2024", emoji:"💎", color:"#1a0f1a", guests:["FOTOGRAFI","DJ"] }
+];
+
+// ── FILM STRIP ──
 function buildFilmStrip(el) {
   el.innerHTML = '';
   const count = Math.floor(window.innerWidth / 32) + 2;
@@ -508,18 +659,39 @@ function buildFilmStrip(el) {
     el.appendChild(h);
   }
 }
-
 buildFilmStrip(document.getElementById('stripTop'));
 buildFilmStrip(document.getElementById('stripBottom'));
 
-function showTable(table, highlightedGuest) {
-  const overlay = document.getElementById('transitionOverlay');
-  overlay.classList.add('flash');
+// ── CIAK TRANSITION ──
+function doCiak(callback) {
+  const overlay = document.getElementById('ciakOverlay');
+  const top = document.getElementById('ciakTop');
 
+  // 1. Fade in overlay
+  overlay.classList.add('show');
+  top.classList.remove('slam');
+
+  // 2. After brief pause, slam the ciak down
   setTimeout(() => {
-    overlay.classList.remove('flash');
+    top.classList.add('slam');
+
+    // 3. Hold for a beat, then run callback + fade out
+    setTimeout(() => {
+      callback();
+      setTimeout(() => {
+        overlay.classList.remove('show');
+        top.classList.remove('slam');
+      }, 180);
+    }, 320);
+  }, 150);
+}
+
+function showTable(table, highlightedGuest, useCiak = true) {
+  if (useCiak) {
+    doCiak(() => renderTable(table, highlightedGuest));
+  } else {
     renderTable(table, highlightedGuest);
-  }, 250);
+  }
 }
 
 function renderTable(table, highlightedGuest) {
@@ -531,10 +703,8 @@ function renderTable(table, highlightedGuest) {
   idle.classList.add('hidden');
   display.classList.add('visible');
 
-  // Background glow
   glow.style.background = `radial-gradient(ellipse at center, ${table.color}88 0%, transparent 70%)`;
 
-  // Build content (re-render to retrigger animations)
   const guestChips = table.guests.map((g, i) => {
     const initials = g.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
     const isSpotlight = highlightedGuest && g === highlightedGuest;
@@ -581,31 +751,113 @@ function renderTable(table, highlightedGuest) {
   `;
 }
 
-// Listen for messages from the LISTA page
+// ── SLIDESHOW ──
+const SLIDE_DURATION = 12000; // ms per tavolo
+let slideshowTimer = null;
+let slideshowIndex = 0;
+let isSlideshow = false;
+
+function startSlideshow() {
+  if (isSlideshow) return;
+  isSlideshow = true;
+  slideshowIndex = 0;
+
+  // Tell Lista to clear the search bar
+  channel.postMessage({ type: 'SLIDESHOW_STARTED' });
+
+  const bar = document.getElementById('slideshowBar');
+  bar.style.display = 'flex';
+
+  runSlide();
+}
+
+function runSlide() {
+  if (!isSlideshow) return;
+
+  const table = tables[slideshowIndex % tables.length];
+  showTable(table, null, true);
+
+  // Notify Lista to highlight this row
+  channel.postMessage({ type: 'SLIDESHOW_ACTIVE', tableId: table.id });
+
+  // Animate progress bar
+  const prog = document.getElementById('slideshowProgress');
+  prog.classList.remove('running');
+  prog.style.transition = 'none';
+  prog.style.setProperty('--w', '0%');
+  // Force reflow
+  void prog.offsetWidth;
+  prog.style.transition = `width ${SLIDE_DURATION}ms linear`;
+  prog.classList.add('running');
+  // Actually drive the ::after via a direct inner element approach
+  prog.innerHTML = `<div id="progFill" style="height:100%;background:var(--gold);border-radius:2px;width:0%;transition:width ${SLIDE_DURATION}ms linear"></div>`;
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      const fill = document.getElementById('progFill');
+      if (fill) fill.style.width = '100%';
+    });
+  });
+
+  slideshowTimer = setTimeout(() => {
+    slideshowIndex = (slideshowIndex + 1) % tables.length;
+    runSlide();
+  }, SLIDE_DURATION);
+}
+
+function stopSlideshow() {
+  if (!isSlideshow) return;
+  isSlideshow = false;
+  clearTimeout(slideshowTimer);
+  slideshowTimer = null;
+  const bar = document.getElementById('slideshowBar');
+  bar.style.display = 'none';
+}
+
+// Start slideshow automatically after 5s of idle
+const idleScreen = document.getElementById('idleScreen');
+let idleSlideshowTimer = setTimeout(() => {
+  startSlideshow();
+}, 5000);
+
+// ── INACTIVITY SLIDESHOW RESTART ──
+const INACTIVITY_MS = 20000;
+let inactivityTimer = null;
+
+function resetInactivityTimer() {
+  clearTimeout(inactivityTimer);
+  inactivityTimer = setTimeout(() => {
+    if (!isSlideshow) startSlideshow();
+  }, INACTIVITY_MS);
+}
+
+// ── BROADCAST LISTENER ──
 channel.addEventListener('message', e => {
   if (e.data.type === 'SELECT_TABLE') {
-    showTable(e.data.table, e.data.highlightedGuest || null);
+    stopSlideshow();
+    clearTimeout(idleSlideshowTimer);
+    showTable(e.data.table, e.data.highlightedGuest || null, true);
+    localStorage.setItem('selectedTable', JSON.stringify(e.data.table));
+    localStorage.setItem('highlightedGuest', e.data.highlightedGuest || '');
+    resetInactivityTimer();
+  }
+  if (e.data.type === 'START_SLIDESHOW') {
+    startSlideshow();
+  }
+  if (e.data.type === 'STOP_SLIDESHOW') {
+    stopSlideshow();
   }
 });
 
-// On load, check if a table is already saved
+// ── ON LOAD: restore last table ──
 const saved = localStorage.getItem('selectedTable');
 if (saved) {
   try {
     const table = JSON.parse(saved);
     const savedGuest = localStorage.getItem('highlightedGuest') || null;
+    clearTimeout(idleSlideshowTimer);
     renderTable(table, savedGuest);
   } catch(e) {}
 }
-
-// Color map for tables (matching lista.html)
-const colorMap = {
-  1: "#2a1f0e", 2: "#0e1a2a", 3: "#1a0e0e", 4: "#0a150a", 5: "#0a0f1a",
-  6: "#1a1505", 7: "#05051a", 8: "#1a1205", 9: "#08100a", 10: "#1a0f1a"
-};
-
-// Patch color into table object if missing
-const _orig = channel.onmessage;
 </script>
 </body>
 </html>
