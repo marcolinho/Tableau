@@ -409,6 +409,54 @@
   }
   #transitionOverlay.flash { opacity: 0.6; }
 
+  .guest-chip.spotlight {
+    border-color: var(--gold) !important;
+    background: rgba(201,168,76,0.13) !important;
+    box-shadow: 0 0 0 1px rgba(201,168,76,0.35), 0 0 20px 4px rgba(201,168,76,0.18);
+    animation: spotlightPulse 2.2s ease-in-out infinite !important;
+    position: relative;
+    z-index: 1;
+  }
+
+  .guest-chip.spotlight .guest-avatar {
+    background: linear-gradient(135deg, rgba(201,168,76,0.65), rgba(201,168,76,0.25));
+    border-color: var(--gold);
+    color: #fff;
+    box-shadow: 0 0 10px rgba(201,168,76,0.5);
+  }
+
+  .guest-chip.spotlight .guest-name {
+    color: var(--gold-pale);
+    font-weight: 600;
+  }
+
+  @keyframes spotlightPulse {
+    0%, 100% {
+      box-shadow: 0 0 0 1px rgba(201,168,76,0.35), 0 0 16px 4px rgba(201,168,76,0.15);
+    }
+    50% {
+      box-shadow: 0 0 0 2px rgba(201,168,76,0.6), 0 0 32px 10px rgba(201,168,76,0.28);
+    }
+  }
+
+  /* Star particle that floats above the highlighted chip */
+  .guest-chip.spotlight::after {
+    content: '✦';
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.7rem;
+    color: var(--gold);
+    animation: starFloat 2.2s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  @keyframes starFloat {
+    0%, 100% { opacity: 0.5; transform: translateX(-50%) translateY(0); }
+    50%       { opacity: 1;   transform: translateX(-50%) translateY(-5px); }
+  }
+
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.2); }
 </style>
@@ -464,17 +512,17 @@ function buildFilmStrip(el) {
 buildFilmStrip(document.getElementById('stripTop'));
 buildFilmStrip(document.getElementById('stripBottom'));
 
-function showTable(table) {
+function showTable(table, highlightedGuest) {
   const overlay = document.getElementById('transitionOverlay');
   overlay.classList.add('flash');
 
   setTimeout(() => {
     overlay.classList.remove('flash');
-    renderTable(table);
+    renderTable(table, highlightedGuest);
   }, 250);
 }
 
-function renderTable(table) {
+function renderTable(table, highlightedGuest) {
   const idle = document.getElementById('idleScreen');
   const display = document.getElementById('display');
   const glow = document.getElementById('bgGlow');
@@ -489,8 +537,9 @@ function renderTable(table) {
   // Build content (re-render to retrigger animations)
   const guestChips = table.guests.map((g, i) => {
     const initials = g.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+    const isSpotlight = highlightedGuest && g === highlightedGuest;
     return `
-      <div class="guest-chip" style="animation:fadeUp 0.4s ${0.55 + i*0.06}s both">
+      <div class="guest-chip${isSpotlight ? ' spotlight' : ''}" style="animation:fadeUp 0.4s ${0.55 + i*0.06}s both" data-guest="${g.replace(/"/g,'&quot;')}">
         <div class="guest-avatar">${initials}</div>
         <span class="guest-name">${g}</span>
       </div>`;
@@ -535,7 +584,7 @@ function renderTable(table) {
 // Listen for messages from the LISTA page
 channel.addEventListener('message', e => {
   if (e.data.type === 'SELECT_TABLE') {
-    showTable(e.data.table);
+    showTable(e.data.table, e.data.highlightedGuest || null);
   }
 });
 
@@ -544,7 +593,8 @@ const saved = localStorage.getItem('selectedTable');
 if (saved) {
   try {
     const table = JSON.parse(saved);
-    renderTable(table);
+    const savedGuest = localStorage.getItem('highlightedGuest') || null;
+    renderTable(table, savedGuest);
   } catch(e) {}
 }
 
