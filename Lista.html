@@ -7,55 +7,69 @@
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --gold: #f0c040;
-    --gold-dim: #a07d1a;
-    --white: #e8e4d8;
-    --off-white: #b0aa9a;
-    --dim: #666050;
-    --dark: #0a0906;
-    --dark-mid: #111008;
-    --row-bg: #0d0c08;
-    --row-hover: #181508;
-    --row-active: #2a2000;
-    --border: rgba(240,192,64,0.15);
-    --border-bright: rgba(240,192,64,0.5);
+    --gold: #b8860b;
+    --gold-light: #d4a017;
+    --bg: #f5f0e8;
+    --bg-warm: #ede8dc;
+    --bg-card: #ffffff;
+    --ink: #1a2e4a;
+    --ink-mid: #2c4a6e;
+    --blue: #5b8db8;
+    --blue-light: #7aafd4;
+    --blue-pale: #b8d4e8;
+    --blue-dim: #8aafc9;
+    --strip-bg: #d8cfc0;
+    --strip-hole: #c0b8a8;
+    --border: rgba(91,141,184,0.2);
+    --border-bright: rgba(91,141,184,0.55);
+    --row-hover: rgba(91,141,184,0.07);
+    --row-active: rgba(91,141,184,0.12);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    background: var(--dark);
-    color: var(--white);
+    background: var(--bg);
+    color: var(--ink);
     font-family: 'Share Tech Mono', monospace;
     min-height: 100vh;
     overflow-x: hidden;
     cursor: default;
   }
 
-  /* CRT scanlines */
+  /* Texture carta sottile */
   body::before {
     content: '';
     position: fixed;
     inset: 0;
-    background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(0,0,0,0.08) 2px,
-      rgba(0,0,0,0.08) 4px
-    );
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
     pointer-events: none;
-    z-index: 200;
+    z-index: 0;
+    opacity: 0.6;
   }
 
-  /* Vignette */
+  /* Pellicola orizzontale in fondo alla pagina come decorazione */
   body::after {
     content: '';
     position: fixed;
-    inset: 0;
-    background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.75) 100%);
+    bottom: 0; left: 0; right: 0;
+    height: 52px;
+    background:
+      linear-gradient(var(--strip-bg), var(--strip-bg)),
+      repeating-linear-gradient(
+        90deg,
+        transparent 0px,
+        transparent 8px,
+        var(--bg) 8px,
+        var(--bg) 30px,
+        transparent 30px,
+        transparent 38px
+      );
+    background-blend-mode: normal;
+    border-top: 2px solid var(--strip-hole);
     pointer-events: none;
-    z-index: 199;
+    z-index: 0;
+    opacity: 0.6;
   }
 
   .page-wrapper {
@@ -63,24 +77,26 @@
     z-index: 1;
     max-width: 860px;
     margin: 0 auto;
-    padding: 40px 20px 60px;
+    padding: 36px 20px 80px;
   }
 
   /* ── HEADER ── */
   header {
-    margin-bottom: 36px;
+    margin-bottom: 32px;
     border: 1px solid var(--border);
-    padding: 24px 28px 20px;
+    padding: 22px 26px 18px;
     position: relative;
-    background: var(--dark-mid);
+    background: var(--bg-card);
+    box-shadow: 0 2px 12px rgba(91,141,184,0.1);
   }
 
+  /* Barra superiore: gradiente oro → azzurro */
   header::before {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 3px;
-    background: var(--gold);
+    background: linear-gradient(90deg, var(--gold), var(--blue-light));
   }
 
   .header-top {
@@ -93,37 +109,35 @@
   .projector-icon {
     font-size: 2rem;
     line-height: 1;
-    filter: drop-shadow(0 0 8px rgba(240,192,64,0.5));
+    filter: drop-shadow(0 0 6px rgba(91,141,184,0.35));
   }
 
-  .header-main {
-    flex: 1;
-  }
+  .header-main { flex: 1; }
 
   .header-label {
     font-family: 'Oswald', sans-serif;
-    font-size: 0.65rem;
-    letter-spacing: 0.4em;
-    color: var(--gold);
+    font-size: 0.62rem;
+    letter-spacing: 0.42em;
+    color: var(--blue-dim);
     text-transform: uppercase;
     margin-bottom: 4px;
   }
 
   .header-title {
     font-family: 'Oswald', sans-serif;
-    font-size: clamp(1.3rem, 3vw, 1.9rem);
+    font-size: clamp(1.3rem, 3vw, 1.85rem);
     font-weight: 700;
-    letter-spacing: 0.15em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--white);
+    color: var(--ink);
     line-height: 1;
   }
 
   .header-title span { color: var(--gold); }
 
   .header-date {
-    font-size: 0.72rem;
-    color: var(--dim);
+    font-size: 0.7rem;
+    color: var(--blue-dim);
     letter-spacing: 0.2em;
     margin-top: 4px;
   }
@@ -144,45 +158,69 @@
   }
 
   .search-label {
-    font-size: 0.65rem;
-    letter-spacing: 0.25em;
-    color: var(--dim);
+    font-size: 0.62rem;
+    letter-spacing: 0.28em;
+    color: var(--blue-dim);
     text-transform: uppercase;
   }
 
   .search-input {
     background: transparent;
     border: none;
-    border-bottom: 1px solid var(--border-bright);
+    border-bottom: 1.5px solid var(--border-bright);
     padding: 4px 8px;
-    color: var(--white);
+    color: var(--ink);
     font-family: 'Share Tech Mono', monospace;
     font-size: 0.85rem;
     letter-spacing: 0.1em;
-    width: 200px;
+    width: 210px;
     outline: none;
     transition: border-color 0.2s;
   }
 
-  .search-input::placeholder { color: var(--dim); }
-  .search-input:focus { border-color: var(--gold); }
+  .search-input::placeholder { color: var(--blue-pale); }
+  .search-input:focus { border-color: var(--blue); }
+
+  /* Badge LIVE: azzurro su sfondo chiaro */
+  .live-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.62rem;
+    letter-spacing: 0.22em;
+    color: #cc2200;
+    text-transform: uppercase;
+  }
+
+  .live-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #cc2200;
+    animation: livePulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes livePulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(204,34,0,0.5); }
+    50%       { opacity: 0.6; box-shadow: 0 0 0 5px rgba(204,34,0,0); }
+  }
 
   /* ── GUEST MATCH PANEL ── */
   .guest-match {
-    margin-bottom: 24px;
-    border: 1px solid var(--gold);
-    background: rgba(240,192,64,0.04);
+    margin-bottom: 22px;
+    border: 1.5px solid var(--blue);
+    background: var(--bg-card);
     animation: rowIn 0.3s both;
     overflow: hidden;
+    box-shadow: 0 2px 12px rgba(91,141,184,0.12);
   }
 
   .guest-match-header {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 14px 18px;
-    border-bottom: 1px solid rgba(240,192,64,0.2);
-    background: rgba(240,192,64,0.06);
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(91,141,184,0.07);
   }
 
   .gm-icon { font-size: 1.1rem; }
@@ -192,13 +230,13 @@
     font-size: 0.6rem;
     letter-spacing: 0.35em;
     text-transform: uppercase;
-    color: var(--gold);
+    color: var(--blue);
   }
 
   .gm-count {
     margin-left: auto;
     font-size: 0.6rem;
-    color: var(--dim);
+    color: var(--blue-dim);
     letter-spacing: 0.15em;
   }
 
@@ -207,14 +245,14 @@
     grid-template-columns: 1fr auto;
     align-items: center;
     padding: 12px 18px;
-    border-bottom: 1px solid rgba(240,192,64,0.08);
+    border-bottom: 1px solid var(--border);
     cursor: pointer;
     transition: background 0.15s;
     gap: 16px;
   }
 
   .guest-match-row:last-child { border-bottom: none; }
-  .guest-match-row:hover { background: rgba(240,192,64,0.06); }
+  .guest-match-row:hover { background: var(--row-hover); }
 
   .gm-guest-name {
     font-family: 'Oswald', sans-serif;
@@ -222,7 +260,7 @@
     font-weight: 500;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--white);
+    color: var(--ink);
   }
 
   .gm-guest-name mark {
@@ -237,141 +275,119 @@
     flex-shrink: 0;
   }
 
+  /* Pill tavolo: bordo e testo oro */
   .gm-table-pill {
     font-family: 'Oswald', sans-serif;
-    font-size: 0.65rem;
+    font-size: 0.62rem;
     font-weight: 600;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     padding: 4px 10px;
-    border: 1px solid var(--gold);
+    border: 1.5px solid var(--gold);
     color: var(--gold);
-    background: rgba(240,192,64,0.08);
+    background: rgba(184,134,11,0.06);
     white-space: nowrap;
   }
 
   .gm-movie {
     font-size: 0.7rem;
-    color: var(--dim);
+    color: var(--blue-dim);
     letter-spacing: 0.08em;
     white-space: nowrap;
-  }
-
-  .live-badge {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.65rem;
-    letter-spacing: 0.2em;
-    color: var(--gold);
-    text-transform: uppercase;
-  }
-
-  .live-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--gold);
-    animation: livePulse 1.5s ease-in-out infinite;
-  }
-
-  @keyframes livePulse {
-    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(240,192,64,0.4); }
-    50% { opacity: 0.6; box-shadow: 0 0 0 4px rgba(240,192,64,0); }
   }
 
   /* ── BOARD ── */
   .board {
     border: 1px solid var(--border);
     overflow: hidden;
+    background: var(--bg-card);
+    box-shadow: 0 2px 16px rgba(91,141,184,0.1);
   }
 
-  /* Column headers */
+  /* Header colonne: bordo inferiore gradiente oro→azzurro */
   .board-header {
     display: grid;
     grid-template-columns: 90px 100px 1fr 90px;
-    background: var(--dark-mid);
-    border-bottom: 2px solid var(--gold);
+    background: var(--bg-warm);
+    border-bottom: 2px solid;
+    border-image: linear-gradient(90deg, var(--gold), var(--blue-light)) 1;
     padding: 0;
   }
 
   .col-head {
     font-family: 'Oswald', sans-serif;
-    font-size: 0.6rem;
-    letter-spacing: 0.4em;
+    font-size: 0.58rem;
+    letter-spacing: 0.42em;
     text-transform: uppercase;
-    color: var(--gold-dim);
+    color: var(--blue-dim);
     padding: 10px 16px;
     border-right: 1px solid var(--border);
   }
 
   .col-head:last-child { border-right: none; text-align: right; }
 
-  /* Rows */
+  /* Righe */
   .board-row {
     display: grid;
     grid-template-columns: 90px 100px 1fr 90px;
     border-bottom: 1px solid var(--border);
     cursor: pointer;
-    background: var(--row-bg);
+    background: var(--bg-card);
     transition: background 0.15s;
     position: relative;
     animation: rowIn 0.4s both;
   }
 
   @keyframes rowIn {
-    from { opacity: 0; transform: translateX(-8px); }
+    from { opacity: 0; transform: translateX(-6px); }
     to   { opacity: 1; transform: translateX(0); }
   }
 
   .board-row:last-child { border-bottom: none; }
+  .board-row:hover { background: var(--row-hover); }
 
-  .board-row:hover {
-    background: var(--row-hover);
-  }
-
-  .board-row.active {
-    background: var(--row-active);
-  }
+  /* Riga attiva: sfondo azzurro tenue + linea sinistra oro→azzurro */
+  .board-row.active { background: var(--row-active); }
 
   .board-row.active::before {
     content: '';
     position: absolute;
     left: 0; top: 0; bottom: 0;
     width: 3px;
-    background: var(--gold);
+    background: linear-gradient(180deg, var(--gold), var(--blue));
   }
 
   .cell {
-    padding: 14px 16px;
+    padding: 13px 16px;
     border-right: 1px solid var(--border);
     display: flex;
     align-items: center;
-    font-size: 0.88rem;
+    font-size: 0.86rem;
     letter-spacing: 0.05em;
   }
 
   .cell:last-child { border-right: none; }
 
   .cell-time {
-    color: var(--off-white);
-    font-size: 0.85rem;
-    letter-spacing: 0.08em;
+    color: var(--blue-dim);
+    font-size: 0.83rem;
+    letter-spacing: 0.09em;
   }
 
   .cell-sala {
-    color: var(--off-white);
+    color: var(--blue-dim);
     font-size: 0.8rem;
     letter-spacing: 0.12em;
   }
 
   .cell-sala strong {
     font-family: 'Oswald', sans-serif;
-    font-weight: 500;
+    font-weight: 600;
     font-size: 1rem;
-    color: var(--white);
+    color: var(--ink);
   }
 
-  .board-row.active .cell-sala strong { color: var(--gold); }
+  .board-row.active .cell-sala strong { color: var(--blue); }
 
   .cell-movie {
     flex-direction: column;
@@ -382,19 +398,19 @@
   .movie-name {
     font-family: 'Oswald', sans-serif;
     font-weight: 600;
-    font-size: 1rem;
-    letter-spacing: 0.12em;
+    font-size: 0.98rem;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--white);
+    color: var(--ink);
     transition: color 0.2s;
   }
 
   .board-row:hover .movie-name,
-  .board-row.active .movie-name { color: var(--gold); }
+  .board-row.active .movie-name { color: var(--blue); }
 
   .movie-meta {
-    font-size: 0.7rem;
-    color: var(--dim);
+    font-size: 0.68rem;
+    color: var(--blue-dim);
     letter-spacing: 0.1em;
     display: flex;
     align-items: center;
@@ -403,49 +419,48 @@
 
   .movie-emoji { font-size: 0.75rem; }
 
-  .cell-stato {
-    justify-content: flex-end;
-  }
+  .cell-stato { justify-content: flex-end; }
 
+  /* Badge stato */
   .stato-badge {
     font-family: 'Oswald', sans-serif;
-    font-size: 0.6rem;
+    font-size: 0.58rem;
     font-weight: 500;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     padding: 4px 8px;
-    border: 1px solid;
+    border: 1px solid var(--border);
     border-radius: 1px;
-    color: var(--dim);
-    border-color: var(--border);
+    color: var(--blue-pale);
     transition: all 0.2s;
   }
 
+  /* Badge active: oro con pulse */
   .board-row.active .stato-badge {
     color: var(--gold);
     border-color: var(--gold);
-    background: rgba(240,192,64,0.08);
+    background: rgba(184,134,11,0.07);
     animation: badgePulse 2s ease-in-out infinite;
   }
 
   @keyframes badgePulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(240,192,64,0); }
-    50% { box-shadow: 0 0 8px 2px rgba(240,192,64,0.15); }
+    0%, 100% { box-shadow: 0 0 0 0 rgba(184,134,11,0); }
+    50%       { box-shadow: 0 0 8px 2px rgba(184,134,11,0.2); }
   }
 
   /* No results */
   .no-results {
     text-align: center;
     padding: 48px;
-    color: var(--dim);
+    color: var(--blue-dim);
     font-size: 0.85rem;
     letter-spacing: 0.15em;
     border-bottom: 1px solid var(--border);
   }
 
-  /* ── FOOTER ── */
+  /* Footer */
   .board-footer {
-    margin-top: 20px;
+    margin-top: 18px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -453,25 +468,25 @@
   }
 
   .footer-note {
-    font-size: 0.65rem;
-    color: var(--dim);
+    font-size: 0.62rem;
+    color: var(--blue-dim);
     letter-spacing: 0.18em;
     text-transform: uppercase;
     font-style: italic;
   }
 
   .total-count {
-    font-size: 0.65rem;
-    color: var(--dim);
+    font-size: 0.62rem;
+    color: var(--blue-dim);
     letter-spacing: 0.15em;
   }
 
   .total-count span { color: var(--gold); }
 
-  /* Scrollbar */
   ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-thumb { background: rgba(240,192,64,0.2); }
+  ::-webkit-scrollbar-thumb { background: rgba(91,141,184,0.25); }
 
+  /* ── SLIDESHOW BUTTON ── */
   #slideshowBtn {
     font-family: 'Oswald', sans-serif;
     font-size: 0.6rem;
@@ -479,22 +494,22 @@
     letter-spacing: 0.25em;
     text-transform: uppercase;
     padding: 5px 12px;
-    border: 1px solid rgba(240,192,64,0.3);
+    border: 1px solid var(--border);
     background: transparent;
-    color: rgba(240,192,64,0.45);
+    color: var(--blue-dim);
     cursor: pointer;
     transition: all 0.2s;
     border-radius: 1px;
   }
   #slideshowBtn:hover {
-    border-color: var(--gold);
-    color: var(--gold);
-    background: rgba(240,192,64,0.06);
+    border-color: var(--blue);
+    color: var(--blue);
+    background: rgba(91,141,184,0.07);
   }
   #slideshowBtn.active {
     border-color: var(--gold);
     color: var(--gold);
-    background: rgba(240,192,64,0.1);
+    background: rgba(184,134,11,0.07);
     animation: badgePulse 2s ease-in-out infinite;
   }
 </style>
@@ -514,7 +529,7 @@
     <div class="header-bottom">
       <div class="search-wrap">
         <span class="search-label">CERCA</span>
-        <input class="search-input" type="text" id="searchInput" placeholder="film, sala…">
+        <input class="search-input" type="text" id="searchInput" placeholder="nome, film, sala…">
       </div>
       <div class="live-badge">
         <div class="live-dot"></div>
@@ -547,25 +562,23 @@
 
 <script>
 const tables = [
-  { id:1,  movie:"Harry Potter",   year:"2001", emoji:"🎩", color:"#2a1f0e", guests:["Alessia Cavicchio","Michela Galli","Eleonora Perotta","Francesco Mammoliti","Fidanzata Francesco","Arianna Bressan"] },
-  { id:2,  movie:"Fast & Furious",   year:"2001", emoji:"🍾", color:"#0e1a2a", guests:["Martina Paganini","Luca Nozzolillo","Barbara Colombo","Gabriele","Kevin Re","Davide Collato","Alessandro Collato","Chiara Lange","Lorenzo Tinelli","Dario Granvillano"] },
-  { id:3,  movie:"The Avengers",    year:"2012", emoji:"📽️", color:"#1a0e0e", guests:["Marco Sardina","Aurora Carretta","Giorgia Bonanno","Francesco Mammoliti","Stefano Bonanno","Alessia de Benedetto","Aurora de Benedetto","Tommaso","Federico Zigrillo","Antonella"] },
-  { id:4,  movie:"Twilight",   year:"2008", emoji:"🥀", color:"#0a150a", guests:["Elisabetta Ancona","Emanuele Sardina","Lucrezia Ancona","Francesco Bonanno","Angela Ancona","Sebastiano Zigrillo","Mario Ancona","Dino de Benedetto","Ombretta"] },
-  { id:5,  movie:"Il Signore degli Anelli",   year:"2001", emoji:"⚓", color:"#0a0f1a", guests:["Elisabetta Sola","Roberto Truzzi","Massimiliano Loreggiola","Silvia Mussini","Daniela de Bernardi","Anna Monolo","Tiziano Sola","Sara Sola","Niccolò Zanzottera","Daniel Zanzottera","? Zanzottera"] },
-  { id:6,  movie:"Footloose",     year:"2011", emoji:"🛵", color:"#1a1505", guests:["Alessia Truzzi","Arianna Truzzi","Alice Loreggiola","Fidanzato Alice","Sara Truzzi","Stefano Venturini","Lorenzo Venturini","Enza De Santis"] },
-  { id:7,  movie:"I Pirati dei Caraibi",  year:"2003", emoji:"🚀", color:"#05051a", guests:["Lidia Spina","Davide Spina","Giuseppina Sardina","Francesco Spina","Sebastiano Sardina","Isabella","Giuseppe Sardina","Sofia Sardina","Angelo","Angela Sardina"] },
-  { id:8,  movie:"50 Volte il primo bacio",  year:"2004", emoji:"🌟", color:"#1a1205", guests:["Valentina Ligas","Federico Caironi","Melissa Caironi","Alessandra Caironi","Valeria Ligas","Giuseppe","Francesca Monolo","Marina Mazza","Ernesto Monolo","Gianna Monolo","Giorgio Ligas"] },
-  { id:9,  movie:"Una Notte da Leoni",   year:"2009", emoji:"🌧️", color:"#08100a", guests:["Walter Buongiovanni","Loredana","Giorgia Buongiovanni","Matteo Buongiovanni","Ilaria Garruto","Francesco Garruto","Anna","Cristina Radaelli","Beatrice Ghiringhelli","Matteo Ghiringhelli"] },
-  { id:10, movie:"Hunger Games",   year:"2012", emoji:"💎", color:"#1a0f1a", guests:["Giorgio Ancona","Patrizia","Riccardo Ancona","Alessandro Ancona","Fidanzata Alessandro","Maila Ancona","Francesca Ancona"] },
-  { id:11, movie:"Forrest Gump",   year:"1994", emoji:"💎", color:"#1a0f1a", guests:["Nicola Ancona","Mina","Giovanni Ancona","Raffaella","Antonio Ancona","Irene","Carlo Ancona","Lina"] },
-  { id:12, movie:"Avatar",    year:"2009", emoji:"💎", color:"#1a0f1a", guests:["Giovanni Totaro","Marinella","Francesca Totaro","Angela Totaro","Zio Gino"] },
-  { id:13, movie:"Quo Vado",    year:"2016", emoji:"💎", color:"#1a0f1a", guests:["Antonia De Bernardi","Claudio","Rosangela Sola","Pinuccia Sola","Pinuccio","Adelina Ceolato","Ezio Sola","Santina Sola"] },
-  { id:14, movie:"Bohemian Rapsody",  year:"2018", emoji:"💎", color:"#1a0f1a", guests:["Vladlena Nikolaevna Lvova","Carmelina Polichetti","Francesca Riccardo","Maria Grazia Rosa Sbarra","Matteo Manzelli","Alessio Giuseppe Paleari"] },
-  { id:15, movie:"Fall Guy",  year:"2024", emoji:"💎", color:"#1a0f1a", guests:["FOTOGRAFI","DJ"] }
-
+  { id:1,  movie:"Harry Potter",             year:"2001", emoji:"🎩", color:"#3a6a9a", guests:["Alessia Cavicchio","Michela Galli","Eleonora Perotta","Francesco Mammoliti","Fidanzata Francesco","Arianna Bressan"] },
+  { id:2,  movie:"Fast & Furious",           year:"2001", emoji:"🍾", color:"#5080a0", guests:["Martina Paganini","Luca Nozzolillo","Barbara Colombo","Gabriele","Kevin Re","Davide Collato","Alessandro Collato","Chiara Lange","Lorenzo Tinelli","Dario Granvillano"] },
+  { id:3,  movie:"The Avengers",             year:"2012", emoji:"📽️", color:"#4878a8", guests:["Marco Sardina","Aurora Carretta","Giorgia Bonanno","Francesco Mammoliti","Stefano Bonanno","Alessia de Benedetto","Aurora de Benedetto","Tommaso","Federico Zigrillo","Antonella"] },
+  { id:4,  movie:"Twilight",                 year:"2008", emoji:"🥀", color:"#607090", guests:["Elisabetta Ancona","Emanuele Sardina","Lucrezia Ancona","Francesco Bonanno","Angela Ancona","Sebastiano Zigrillo","Mario Ancona","Dino de Benedetto","Ombretta"] },
+  { id:5,  movie:"Il Signore degli Anelli",  year:"2001", emoji:"⚓", color:"#4070a0", guests:["Elisabetta Sola","Roberto Truzzi","Massimiliano Loreggiola","Silvia Mussini","Daniela de Bernardi","Anna Monolo","Tiziano Sola","Sara Sola","Niccolò Zanzottera","Daniel Zanzottera","? Zanzottera"] },
+  { id:6,  movie:"Footloose",                year:"2011", emoji:"🛵", color:"#5890b8", guests:["Alessia Truzzi","Arianna Truzzi","Alice Loreggiola","Fidanzato Alice","Sara Truzzi","Stefano Venturini","Lorenzo Venturini","Enza De Santis"] },
+  { id:7,  movie:"I Pirati dei Caraibi",     year:"2003", emoji:"🚀", color:"#3868a0", guests:["Lidia Spina","Davide Spina","Giuseppina Sardina","Francesco Spina","Sebastiano Sardina","Isabella","Giuseppe Sardina","Sofia Sardina","Angelo","Angela Sardina"] },
+  { id:8,  movie:"50 Volte il primo bacio",  year:"2004", emoji:"🌟", color:"#6090b0", guests:["Valentina Ligas","Federico Caironi","Melissa Caironi","Alessandra Caironi","Valeria Ligas","Giuseppe","Francesca Monolo","Marina Mazza","Ernesto Monolo","Gianna Monolo","Giorgio Ligas"] },
+  { id:9,  movie:"Una Notte da Leoni",       year:"2009", emoji:"🌧️", color:"#4878a0", guests:["Walter Buongiovanni","Loredana","Giorgia Buongiovanni","Matteo Buongiovanni","Ilaria Garruto","Francesco Garruto","Anna","Cristina Radaelli","Beatrice Ghiringhelli","Matteo Ghiringhelli"] },
+  { id:10, movie:"Hunger Games",             year:"2012", emoji:"💎", color:"#5080b0", guests:["Giorgio Ancona","Patrizia","Riccardo Ancona","Alessandro Ancona","Fidanzata Alessandro","Maila Ancona","Francesca Ancona"] },
+  { id:11, movie:"Forrest Gump",             year:"1994", emoji:"💎", color:"#4070a0", guests:["Nicola Ancona","Mina","Giovanni Ancona","Raffaella","Antonio Ancona","Irene","Carlo Ancona","Lina"] },
+  { id:12, movie:"Avatar",                   year:"2009", emoji:"💎", color:"#3878a8", guests:["Giovanni Totaro","Marinella","Francesca Totaro","Angela Totaro","Zio Gino"] },
+  { id:13, movie:"Quo Vado",                 year:"2016", emoji:"💎", color:"#5888a8", guests:["Antonia De Bernardi","Claudio","Rosangela Sola","Pinuccia Sola","Pinuccio","Adelina Ceolato","Ezio Sola","Santina Sola"] },
+  { id:14, movie:"Bohemian Rapsody",         year:"2018", emoji:"💎", color:"#4880b0", guests:["Vladlena Nikolaevna Lvova","Carmelina Polichetti","Francesca Riccardo","Maria Grazia Rosa Sbarra","Matteo Manzelli","Alessio Giuseppe Paleari"] },
+  { id:15, movie:"Fall Guy",                 year:"2024", emoji:"💎", color:"#507090", guests:["FOTOGRAFI","DJ"] }
 ];
 
-// Staggered times starting at 18:00, +15 min each
 const startMinutes = 18 * 60;
 function getTime(i) {
   const m = startMinutes + i * 15;
@@ -591,9 +604,8 @@ function renderGuestMatches(q) {
   const matches = [];
   tables.forEach(t => {
     t.guests.forEach(g => {
-      if (g.toLowerCase().includes(q.toLowerCase())) {
+      if (g.toLowerCase().includes(q.toLowerCase()))
         matches.push({ guest: g, table: t });
-      }
     });
   });
 
@@ -607,7 +619,7 @@ function renderGuestMatches(q) {
         <span class="gm-count">${matches.length} risultat${matches.length === 1 ? 'o' : 'i'}</span>
       </div>
       ${matches.map(m => `
-        <div class="guest-match-row" onclick="selectTable(${m.table.id}, '${m.guest.replace(/'/g, "\\'")}')">
+        <div class="guest-match-row" onclick="selectTable(${m.table.id})">
           <span class="gm-guest-name">${highlightMatch(m.guest, q)}</span>
           <div class="gm-table-info">
             <span class="gm-movie">${m.table.emoji} ${m.table.movie}</span>
@@ -621,7 +633,6 @@ function renderGuestMatches(q) {
 
 function renderRows(filter = '') {
   const body = document.getElementById('boardBody');
-  const countLabel = document.getElementById('countLabel');
   const q = filter.toLowerCase();
 
   const filtered = tables.filter(t =>
@@ -629,14 +640,7 @@ function renderRows(filter = '') {
     String(t.id).includes(q) ||
     t.year.includes(q)
   );
-/*
-  countLabel.innerHTML = `<span>${filtered.length}</span> / ${tables.length} tavoli`;
 
-  if (!filtered.length) {
-    body.innerHTML = `<div class="no-results">Nessun risultato per "${filter}"</div>`;
-    return;
-  }
-*/
   body.innerHTML = filtered.map((t, i) => `
     <div class="board-row ${activeTable === t.id ? 'active' : ''}"
          onclick="selectTable(${t.id})"
@@ -657,40 +661,39 @@ function renderRows(filter = '') {
   `).join('');
 }
 
-function selectTable(id, highlightedGuest = null) {
+function selectTable(id) {
   activeTable = id;
   const table = tables.find(t => t.id === id);
-  channel.postMessage({ type: 'SELECT_TABLE', table, highlightedGuest });
+  channel.postMessage({ type: 'SELECT_TABLE', table });
   localStorage.setItem('selectedTable', JSON.stringify(table));
-  localStorage.setItem('highlightedGuest', highlightedGuest || '');
-  const q = document.getElementById('searchInput').value;
-  renderGuestMatches(q);
-  renderRows(q);
+
+  // Svuota la barra di ricerca e ripristina la lista
+  const input = document.getElementById('searchInput');
+  input.value = '';
+  document.getElementById('guestMatchPanel').innerHTML = '';
+  document.querySelector('.board').style.display = 'block';
+  document.querySelector('.board-footer').style.display = 'flex';
+
+  renderRows('');
 }
 
 document.getElementById('searchInput').addEventListener('input', e => {
   const val = e.target.value;
-
   renderGuestMatches(val);
 
-  // verifica se ci sono ospiti trovati
   const hasGuestMatches = tables.some(t =>
-    t.guests.some(g =>
-      g.toLowerCase().includes(val.toLowerCase())
-    )
+    t.guests.some(g => g.toLowerCase().includes(val.toLowerCase()))
   );
 
-  // mostra/nascondi la board
   document.querySelector('.board').style.display =
     hasGuestMatches && val.length >= 2 ? 'none' : 'block';
-
   document.querySelector('.board-footer').style.display =
     hasGuestMatches && val.length >= 2 ? 'none' : 'flex';
 
   renderRows(val);
 });
 
-// Slideshow control
+// ── SLIDESHOW CONTROL ──
 let slideshowActive = false;
 function toggleSlideshow() {
   slideshowActive = !slideshowActive;
@@ -706,7 +709,7 @@ function toggleSlideshow() {
   }
 }
 
-// Slideshow sync from Display
+// Sync updates from Display back to Lista
 channel.addEventListener('message', e => {
   if (e.data.type === 'SLIDESHOW_ACTIVE') {
     activeTable = e.data.tableId;
@@ -722,7 +725,6 @@ channel.addEventListener('message', e => {
   }
 });
 
-// Sync from storage
 const saved = localStorage.getItem('selectedTable');
 if (saved) {
   try { activeTable = JSON.parse(saved).id; } catch(e) {}
