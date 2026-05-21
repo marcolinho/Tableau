@@ -578,7 +578,7 @@ function renderGuestMatches(q) {
         <span class="gm-count">${matches.length} risultat${matches.length === 1 ? 'o' : 'i'}</span>
       </div>
       ${matches.map(m => `
-        <div class="guest-match-row" onclick="selectTable(${m.table.id})">
+        <div class="guest-match-row" onclick="selectTable(${m.table.id}, '${m.guest.replace(/'/g, "\\'")}')">
           <span class="gm-guest-name">${highlightMatch(m.guest, q)}</span>
           <div class="gm-table-info">
             <span class="gm-movie">${m.table.emoji} ${m.table.movie}</span>
@@ -628,11 +628,12 @@ function renderRows(filter = '') {
   `).join('');
 }
 
-function selectTable(id) {
+function selectTable(id, highlightedGuest = null) {
   activeTable = id;
   const table = tables.find(t => t.id === id);
-  channel.postMessage({ type: 'SELECT_TABLE', table });
+  channel.postMessage({ type: 'SELECT_TABLE', table, highlightedGuest });
   localStorage.setItem('selectedTable', JSON.stringify(table));
+  localStorage.setItem('highlightedGuest', highlightedGuest || '');
   const q = document.getElementById('searchInput').value;
   renderGuestMatches(q);
   renderRows(q);
